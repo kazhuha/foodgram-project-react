@@ -4,7 +4,10 @@ ignore =
 exclude =
     */migrations/,
     venv/,
-    env/
+    env/,
+    ./backend/receptorium/receptorium/settings.py,
+    ./backend/receptorium/recipes/migrations/,
+    ./backend/receptorium/user/migrations/,
 per-file-ignores =
     */settings.py:E501
 max-complexity = 10
