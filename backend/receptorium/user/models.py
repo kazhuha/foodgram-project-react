@@ -7,7 +7,7 @@ class User(AbstractUser):
     password = models.CharField(
         max_length=150, blank=False, verbose_name='Пароль'
     )
-    email = models.CharField(
+    email = models.EmailField(
         max_length=254, blank=False, unique=True, verbose_name='Почта'
     )
     first_name = models.CharField(

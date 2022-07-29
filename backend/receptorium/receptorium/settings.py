@@ -27,8 +27,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'user.apps.UserConfig',
     'api.apps.ApiConfig',
+    'recipes.apps.RecipesConfig',
     'rest_framework.authtoken',
     'djoser'
 ]
@@ -125,6 +127,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
 
+RECIPE_PER_PAGE = 6
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -133,7 +137,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 6,
+    'PAGE_SIZE': RECIPE_PER_PAGE,
+    'SEARCH_PARAM': 'name'
 }
 
 DJOSER = {
@@ -141,5 +146,20 @@ DJOSER = {
     'PERMISSIONS': {
         'user_list': ['api.permissions.AllowAll'],
         'user': ['rest_framework.permissions.IsAuthenticated'],
+        'activation': ['api.permissions.NotAllow'],
+        'password_reset': ['rest_framework.permissions.AllowAny'],
+        'password_reset_confirm': ['rest_framework.permissions.AllowAny'],
+        'set_password': ['rest_framework.permissions.IsAuthenticated'],
+        'username_reset': ['api.permissions.NotAllow'],
+        'username_reset_confirm': ['api.permissions.NotAllow'],
+        'set_username': ['api.permissions.NotAllow'],
+        'user_create': ['rest_framework.permissions.AllowAny'],
+        'user_delete': ['api.permissions.NotAllow'],
+        'token_create': ['rest_framework.permissions.AllowAny'],
+        'token_destroy': ['rest_framework.permissions.IsAuthenticated'],
     },
+    'SERIALIZERS': {
+        'user': 'api.serializers.CustomUserSerializer',
+        'current_user': 'api.serializers.CustomUserSerializer',
+    }
 }
