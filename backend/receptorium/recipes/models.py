@@ -1,8 +1,7 @@
 import webcolors
-
 from django.core.validators import MinValueValidator
-from django.forms import ValidationError
 from django.db import models
+from django.forms import ValidationError
 from user.models import User
 
 from .validators import validate_hex_color
