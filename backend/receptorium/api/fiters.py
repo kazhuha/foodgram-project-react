@@ -3,6 +3,8 @@ from recipes.models import Recipe
 
 
 class RecipeFilter(filters.FilterSet):
+    """Фильтрует рецепты по избранному, списку покупок,
+    и тэгам"""
     is_favorited = filters.BooleanFilter(
         field_name='is_favorited',
         method='favorite_filter'

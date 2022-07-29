@@ -8,6 +8,7 @@ from user.models import User
 
 
 class CustomUserSerializer(UserSerializer):
+    """Кастомный сериализатор для модели юзера"""
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -31,18 +32,22 @@ class CustomUserSerializer(UserSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+    """Сериализатор для ингредиентов"""
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit')
 
 
 class TagSerializer(serializers.ModelSerializer):
+    """Сериализатор для тэгов"""
     class Meta:
         model = Tag
         fields = ('id', 'name', 'color', 'slug')
 
 
 class RecipeIngredientsSerializer(serializers.ModelSerializer):
+    """Сериализатор для промежуточной модели, свзявающей рецепт
+    и ингедиенты"""
     id = serializers.IntegerField(source='ingredient.id')
     name = serializers.StringRelatedField(source='ingredient.name')
     measurement_unit = serializers.StringRelatedField(
@@ -55,6 +60,7 @@ class RecipeIngredientsSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения рецептов"""
     tags = TagSerializer(read_only=True, many=True)
     ingredients = RecipeIngredientsSerializer(
         read_only=True,
@@ -99,6 +105,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class IngredientForRecipeCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор для поля ингредиенты для сериализатора для
+    создания рецептов"""
     id = serializers.IntegerField()
 
     class Meta:
@@ -107,6 +115,7 @@ class IngredientForRecipeCreateSerializer(serializers.ModelSerializer):
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания рецептов"""
     ingredients = IngredientForRecipeCreateSerializer(many=True)
     author = CustomUserSerializer(read_only=True)
     image = Base64ImageField()
@@ -171,12 +180,15 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
 
 class RecipeForFavoriteSubscriptionsSerializer(serializers.ModelSerializer):
+    """Вложенный сериализатор для сериализаторов для избранного
+    и подписок"""
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class SubscriptionsSerializer(CustomUserSerializer):
+    """Сериализатор для подписок"""
     recipes = RecipeForFavoriteSubscriptionsSerializer(many=True)
     recipes_count = serializers.SerializerMethodField()
 

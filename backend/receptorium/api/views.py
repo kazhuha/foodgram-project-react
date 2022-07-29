@@ -19,6 +19,7 @@ from .serializers import (IngredientSerializer, RecipeCreateSerializer,
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    """Вьюсет для ингредиентов"""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
@@ -28,6 +29,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    """Вьюсет для тэгов"""
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, ]
@@ -35,6 +37,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    """Вьюсет для рецептов"""
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend,)
@@ -82,6 +85,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
 class CustomUserViewSet(UserViewSet):
+    """Кастомный вьюсет для юзера"""
     @action(methods=['get'], detail=False)
     def subscriptions(self, request):
         following_users = User.objects.filter(following__user=request.user)

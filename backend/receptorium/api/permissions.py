@@ -2,6 +2,7 @@ from rest_framework import permissions
 
 
 class AllowAll(permissions.BasePermission):
+    """Дает полный доступ"""
     def has_permission(self, request, view):
         return True
 
@@ -10,6 +11,7 @@ class AllowAll(permissions.BasePermission):
 
 
 class NotAllow(permissions.BasePermission):
+    """Запрещает доступ для всех"""
     def has_permission(self, request, view):
         return False
 

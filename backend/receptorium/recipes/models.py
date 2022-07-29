@@ -78,7 +78,7 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
-    "Модель рецептов"
+    """Модель рецептов"""
     author = models.ForeignKey(
         User,
         related_name='recipes',
@@ -110,9 +110,6 @@ class Recipe(models.Model):
         upload_to='recipes/',
         verbose_name='Фото'
     )
-    # fav_total = models.IntegerField(
-    #     default=0
-    # )
 
     class Meta:
         verbose_name = 'Рецепт'
@@ -122,12 +119,10 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
 
-    # def save(self, *args, **kwargs):
-    #     self.fav_total = self.favorites.all().count()
-    #     super().save(*args, **kwargs)
-
 
 class RecipeIngredient(models.Model):
+    """Промежуточная модель для связи
+    ингредиентов и рецепта"""
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -154,6 +149,7 @@ class RecipeIngredient(models.Model):
 
 
 class Follow(models.Model):
+    """Модель подписок"""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -185,6 +181,7 @@ class Follow(models.Model):
 
 
 class ShoppingList(models.Model):
+    """Модель списка покупок"""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -212,6 +209,7 @@ class ShoppingList(models.Model):
 
 
 class Favorite(models.Model):
+    """Модель избранного"""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

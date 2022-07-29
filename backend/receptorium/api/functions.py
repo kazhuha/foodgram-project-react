@@ -9,6 +9,7 @@ from .serializers import (RecipeForFavoriteSubscriptionsSerializer,
 
 
 def object_add_or_delete(model, request, pk):
+    """Функция для создания или удаления объекта из модели"""
     if model == Follow:
         following_user = get_object_or_404(User, id=pk)
         if request.user == following_user:
