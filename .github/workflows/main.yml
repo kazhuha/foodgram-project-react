@@ -7,7 +7,6 @@ jobs:
   build_and_push_to_docker_hub:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
-    needs: tests
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2 
@@ -16,7 +15,7 @@ jobs:
       - name: Login to Docker
         uses: docker/login-action@v1 
         with:
-          username: kazhuha@gmail.com
+          username: kazhuha
           password: SMOY5plol-yon1zar
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2 
