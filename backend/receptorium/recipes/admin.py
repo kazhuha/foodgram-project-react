@@ -21,12 +21,13 @@ class IngredientAdmin(admin.ModelAdmin):
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    def favorite_total(self, obj):
-        return obj.favorites.all().count()
     list_display = ('author', 'name', 'text', 'favorite_total')
     search_fields = ('name', 'author', 'tags')
     list_filter = ('author', 'tags')
     inlines = (RecipeIngredientInline,)
+
+    def favorite_total(self, obj):
+        return obj.favorites.all().count()
 
 
 class FollowAdmin(admin.ModelAdmin):

@@ -1,10 +1,28 @@
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer
+from rest_framework import serializers
+
 from drf_extra_fields.fields import Base64ImageField
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, ShoppingList, Tag)
-from rest_framework import serializers
 from user.models import User
+
+
+def ingredient_for_recipe_create(ingredient_list, recipe_obj):
+    ingredient_obj_list = []
+    for ingredient in ingredient_list:
+        current_ingredient = get_object_or_404(
+            Ingredient,
+            id=ingredient['id']
+        )
+        ingredient_obj_list.append(
+            RecipeIngredient(
+                ingredient=current_ingredient,
+                recipe=recipe_obj,
+                amount=ingredient['amount']
+            )
+        )
+    RecipeIngredient.objects.bulk_create(ingredient_obj_list)
 
 
 class CustomUserSerializer(UserSerializer):
@@ -131,22 +149,20 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'author',
             'image'
         )
+        validators = [
+            serializers.UniqueTogetherValidator(
+                queryset=Recipe.objects.all(),
+                fields=('name', 'text'),
+                message='Такой рецепт уже существует'
+            )
+        ]
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        for ingredient in ingredients:
-            current_ingredient = get_object_or_404(
-                Ingredient,
-                id=ingredient['id']
-            )
-            RecipeIngredient.objects.create(
-                ingredient=current_ingredient,
-                recipe=recipe,
-                amount=ingredient['amount']
-            )
+        ingredient_for_recipe_create(ingredients, recipe)
         return recipe
 
     def update(self, instance, validated_data):
@@ -154,25 +170,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         instance.tags.set(tags)
         RecipeIngredient.objects.filter(recipe=instance.pk).delete()
-        for ingredient in ingredients:
-            current_ingredient = get_object_or_404(
-                Ingredient,
-                id=ingredient['id']
-            )
-            RecipeIngredient.objects.create(
-                ingredient=current_ingredient,
-                recipe=instance,
-                amount=ingredient['amount']
-            )
-        instance.name = validated_data.get('name', instance.name)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get(
-            'cooking_time', instance.cooking_time
-        )
-        instance.author = validated_data.get('author', instance.author)
-        instance.image = validated_data.get('image', instance.image)
-        instance.save()
-        return instance
+        ingredient_for_recipe_create(ingredients, instance)
+        return super().update(instance, validated_data)
 
     def to_representation(self, value):
         serializer = RecipeSerializer(value, context=self.context)

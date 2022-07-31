@@ -1,18 +1,20 @@
+from django.shortcuts import get_object_or_404
 from django.db.models import Sum
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from recipes.models import (Favorite, Follow, Ingredient, Recipe,
-                            RecipeIngredient, ShoppingList, Tag)
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+
+from recipes.models import (Favorite, Follow, Ingredient, Recipe,
+                            RecipeIngredient, ShoppingList, Tag)
 from user.models import User
 
 from .fiters import RecipeFilter
 from .functions import object_add_or_delete
-from .permissions import IsAuthorOrReadOnly
+from .permissions import IsAuthorOrAuthenticatedOrReadOnly
 from .serializers import (IngredientSerializer, RecipeCreateSerializer,
                           RecipeSerializer, SubscriptionsSerializer,
                           TagSerializer)
@@ -42,12 +44,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    permission_classes = [IsAuthenticatedOrReadOnly, ]
-
-    def get_permissions(self):
-        if self.action in ['update', 'partial_update', 'destroy']:
-            self.permission_classes = [IsAuthorOrReadOnly]
-        return super(RecipeViewSet, self).get_permissions()
+    permission_classes = [IsAuthorOrAuthenticatedOrReadOnly]
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
@@ -77,8 +74,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredient_sum'
         )
         text = ''
-        for i in ingredients:
-            text += f'{i[0]} - {i[2]} {i[1]}\r\n'
+        for ingredient in ingredients:
+            text += f'{ingredient[0]} - {ingredient[2]} {ingredient[1]}\r\n'
         response = HttpResponse(text, content_type='text/plain,charset=utf8')
         response['Content-Disposition'] = 'attachment; filename=shopping.txt'
         return response
@@ -102,4 +99,31 @@ class CustomUserViewSet(UserViewSet):
 
     @action(methods=['post', 'delete'], detail=True)
     def subscribe(self, request, id):
-        return object_add_or_delete(Follow, request, id)
+        following_user = get_object_or_404(User, id=id)
+        if request.user == following_user:
+            return Response(
+                data={"error": "Нельзя подписываться на самого себя"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if request.method == 'POST':
+            _, created = Follow.objects.get_or_create(
+                user=request.user, author=following_user
+            )
+            if not created:
+                return Response(
+                    data={"errors": "Автор уже добавлен в список"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            serializer = SubscriptionsSerializer(
+                following_user, context={'request': request}
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if not Follow.objects.filter(
+            user=request.user, author=following_user
+        ).exists():
+            return Response(
+                data={"errors": "Автор отсутствует в списке"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        Follow.objects.get(user=request.user, author=following_user).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
