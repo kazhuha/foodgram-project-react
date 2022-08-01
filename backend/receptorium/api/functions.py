@@ -3,7 +3,6 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from recipes.models import Recipe
-
 from .serializers import RecipeForFavoriteSubscriptionsSerializer
 
 

@@ -3,8 +3,8 @@ import webcolors
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.forms import ValidationError
-from user.models import User
 
+from user.models import User
 from .validators import validate_hex_color
 
 
@@ -12,12 +12,10 @@ class Ingredient(models.Model):
     """Модель ингредиентов"""
     name = models.CharField(
         max_length=100,
-        blank=False,
         verbose_name='Название'
     )
     measurement_unit = models.CharField(
         max_length=10,
-        blank=False,
         verbose_name='Единицы измерения'
     )
 
@@ -40,13 +38,11 @@ class Tag(models.Model):
     """Модель тегов"""
     name = models.CharField(
         max_length=200,
-        blank=False,
         unique=True,
         verbose_name='Название'
     )
     color_name = models.CharField(
         max_length=20,
-        blank=False,
         unique=True,
         verbose_name='Цвет тега',
         help_text='Введите цвет на английском языке',
@@ -60,7 +56,6 @@ class Tag(models.Model):
     )
     slug = models.SlugField(
         max_length=200,
-        blank=False,
         unique=True,
         verbose_name='Slug'
     )
@@ -116,6 +111,11 @@ class Recipe(models.Model):
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
         ordering = ['-pk']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'text', ], name='uniqe_recipe'
+            ),
+        ]
 
     def __str__(self):
         return self.name
@@ -144,6 +144,11 @@ class RecipeIngredient(models.Model):
     class Meta:
         verbose_name = 'Ингредиент для рецепта'
         verbose_name_plural = 'Ингредиенты для рецептов'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient', ], name='uniqe_ingredient'
+            ),
+        ]
 
     def __str__(self):
         return f'{self.recipe} {self.ingredient}'

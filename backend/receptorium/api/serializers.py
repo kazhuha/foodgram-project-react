@@ -1,28 +1,11 @@
-from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
-
 from drf_extra_fields.fields import Base64ImageField
+
+from api.utils import double_checker, ingredient_for_recipe_create
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, ShoppingList, Tag)
 from user.models import User
-
-
-def ingredient_for_recipe_create(ingredient_list, recipe_obj):
-    ingredient_obj_list = []
-    for ingredient in ingredient_list:
-        current_ingredient = get_object_or_404(
-            Ingredient,
-            id=ingredient['id']
-        )
-        ingredient_obj_list.append(
-            RecipeIngredient(
-                ingredient=current_ingredient,
-                recipe=recipe_obj,
-                amount=ingredient['amount']
-            )
-        )
-    RecipeIngredient.objects.bulk_create(ingredient_obj_list)
 
 
 class CustomUserSerializer(UserSerializer):
@@ -156,6 +139,12 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 message='Такой рецепт уже существует'
             )
         ]
+
+    def validate(self, data):
+        tags = data['tags']
+        ingredients = data['ingredients']
+        double_checker([tags, ingredients])
+        return data
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')

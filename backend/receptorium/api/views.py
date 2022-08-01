@@ -11,7 +11,6 @@ from rest_framework.response import Response
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, ShoppingList, Tag)
 from user.models import User
-
 from .fiters import RecipeFilter
 from .functions import object_add_or_delete
 from .permissions import IsAuthorOrAuthenticatedOrReadOnly
