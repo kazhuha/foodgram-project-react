@@ -5,6 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
@@ -44,11 +45,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     permission_classes = [IsAuthorOrAuthenticatedOrReadOnly]
+    pagination_class = LimitOffsetPagination
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
             return RecipeSerializer
         return RecipeCreateSerializer
+
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
