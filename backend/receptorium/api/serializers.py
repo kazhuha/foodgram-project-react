@@ -177,7 +177,7 @@ class RecipeForFavoriteSubscriptionsSerializer(serializers.ModelSerializer):
 
 class SubscriptionsSerializer(CustomUserSerializer):
     """Сериализатор для подписок"""
-    recipes = RecipeForFavoriteSubscriptionsSerializer(many=True)
+    recipes = serializers.SerializerMethodField(many=True)
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -192,6 +192,14 @@ class SubscriptionsSerializer(CustomUserSerializer):
             'recipes',
             'recipes_count'
         )
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        limit = request.GET.get('recipes_limit')
+        queryset = Recipe.objects.filter(author=obj.author)
+        if limit:
+            queryset = queryset[:int(limit)]
+        return RecipeForFavoriteSubscriptionsSerializer(queryset, many=True).data
 
     def get_recipes_count(self, obj):
         return obj.recipes.all().count()
