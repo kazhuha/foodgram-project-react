@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.3'
 services:
 
   db:
@@ -9,7 +9,7 @@ services:
       - ./.env
 
   web:
-    build: ../backend/receptorium
+    image: kazhuha/receptorium
     restart: always
     volumes:
       - static_value:/app/static/
@@ -22,9 +22,7 @@ services:
       - ./.env
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: kazhuha/receptorium_front
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
