@@ -114,7 +114,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': RECIPE_PER_PAGE,
+    # 'PAGE_SIZE': RECIPE_PER_PAGE,
     'SEARCH_PARAM': 'name'
 }
 
