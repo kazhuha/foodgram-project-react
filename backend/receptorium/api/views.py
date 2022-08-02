@@ -5,6 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
@@ -36,6 +37,9 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, ]
     pagination_class = None
 
+class RecipePageNumberPagination(PageNumberPagination):
+    page_size_query_param = 'limit'
+    page_size = 6
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет для рецептов"""
@@ -44,6 +48,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     permission_classes = [IsAuthorOrAuthenticatedOrReadOnly]
+    pagination_class = RecipePageNumberPagination
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
@@ -127,3 +132,5 @@ class CustomUserViewSet(UserViewSet):
             )
         Follow.objects.get(user=request.user, author=following_user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
