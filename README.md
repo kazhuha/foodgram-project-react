@@ -1,6 +1,7 @@
 # FOODGRAM
 ## Социальная сеть для блогеров
 
+![example workflow](https://github.com/kazhuha/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 
 ## Технологии
 
