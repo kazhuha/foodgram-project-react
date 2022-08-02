@@ -177,7 +177,7 @@ class RecipeForFavoriteSubscriptionsSerializer(serializers.ModelSerializer):
 
 class SubscriptionsSerializer(CustomUserSerializer):
     """Сериализатор для подписок"""
-    recipes = serializers.SerializerMethodField(many=True)
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
