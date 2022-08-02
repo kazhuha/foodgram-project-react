@@ -5,7 +5,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
@@ -14,6 +13,7 @@ from recipes.models import (Favorite, Follow, Ingredient, Recipe,
 from user.models import User
 from .fiters import RecipeFilter
 from .functions import object_add_or_delete
+from .pagination import RecipePageNumberPagination
 from .permissions import IsAuthorOrAuthenticatedOrReadOnly
 from .serializers import (IngredientSerializer, RecipeCreateSerializer,
                           RecipeSerializer, SubscriptionsSerializer,
@@ -37,9 +37,6 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, ]
     pagination_class = None
 
-class RecipePageNumberPagination(PageNumberPagination):
-    page_size_query_param = 'limit'
-    page_size = 6
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет для рецептов"""
